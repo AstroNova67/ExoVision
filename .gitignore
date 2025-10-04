@@ -1,0 +1,7 @@
+.venv
+.idea
+.env
+env/
+venv/
+.DS_store
+__pypackages__/
