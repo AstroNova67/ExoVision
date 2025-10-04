@@ -132,23 +132,23 @@ class KOI:
 
     def save_model(self):
         print("Saving models...")
-        joblib.dump(self.adaboost, "saved_models/KOI/adaboost.joblib")
-        joblib.dump(self.stacking, "saved_models/KOI/stacking.joblib")
-        joblib.dump(self.forest_classifier, "saved_models/KOI/forest_classifier.joblib")
-        joblib.dump(self.subspace, "saved_models/KOI/subspace.joblib")
-        joblib.dump(self.extra_trees, "saved_models/KOI/extra_trees.joblib")
-        joblib.dump(self.sc_x, "saved_models/KOI/scaler.joblib")
+        joblib.dump(self.adaboost, "saved_models/adaboost.joblib")
+        joblib.dump(self.stacking, "saved_models/stacking.joblib")
+        joblib.dump(self.forest_classifier, "saved_models/forest_classifier.joblib")
+        joblib.dump(self.subspace, "saved_models/subspace.joblib")
+        joblib.dump(self.extra_trees, "saved_models/extra_trees.joblib")
+        joblib.dump(self.sc_x, "saved_models/scaler.joblib")
 
     def load_model(self):
         print("Loading models...")
-        self.adaboost = joblib.load("saved_models/KOI/adaboost.joblib")
-        self.stacking = joblib.load("saved_models/KOI/stacking.joblib")
+        self.adaboost = joblib.load("saved_models/adaboost.joblib")
+        self.stacking = joblib.load("saved_models/stacking.joblib")
         self.forest_classifier = joblib.load(
-            "saved_models/KOI/forest_classifier.joblib"
+            "saved_models/forest_classifier.joblib"
         )
-        self.subspace = joblib.load("saved_models/KOI/subspace.joblib")
-        self.extra_trees = joblib.load("saved_models/KOI/extra_trees.joblib")
-        self.sc_x = joblib.load("saved_models/KOI/scaler.joblib")
+        self.subspace = joblib.load("saved_models/subspace.joblib")
+        self.extra_trees = joblib.load("saved_models/extra_trees.joblib")
+        self.sc_x = joblib.load("saved_models/scaler.joblib")
 
     def predict(self):
         adaboost_pred = self.adaboost.predict(self.x_test)
@@ -350,8 +350,7 @@ model = KOI(path="datasets/filtered_file.csv")
 # model.train()
 # model.save_model()
 model.load_model()
-model.create_confusion_matrix_plot(model_name="Stacking")
-# model.predict()
+model.predict()
 
 
 # Metrics
