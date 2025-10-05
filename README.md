@@ -49,7 +49,7 @@ Open your terminal and follow these steps:
 **Important:** ExoVision uses OpenAI's API for the AI chat functionality. You'll need your own API key:
 
 1. **Get an API key** from [OpenAI Platform](https://platform.openai.com/api-keys)
-2. **Create a `.env` file** in the `backend/` directory
+2. **Create a `.env` file** 
 3. **Add your key** to the file:
    ```
    OPENAI_API_KEY=sk-proj-your-actual-key-here
