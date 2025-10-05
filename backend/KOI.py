@@ -88,9 +88,9 @@ class KOI:
         self.x_test = self.sc_x.transform(self.x_test)
 
         self.adaboost = AdaBoostClassifier(
-            estimator=DecisionTreeClassifier(max_depth=1),
-            n_estimators=100,  # you can tune this
-            learning_rate=0.1,
+            estimator=DecisionTreeClassifier(max_depth=3),
+            n_estimators=1000,
+            learning_rate=0.2,
         )
 
         estimators = [
@@ -103,23 +103,27 @@ class KOI:
 
         self.subspace = BaggingClassifier(
             estimator=DecisionTreeClassifier(),
-            n_estimators=1000,
-            max_features=0.5,  # subspace ratio
-            max_samples=0.8,
+            n_estimators=1500,
+            max_features=0.7,  # subspace ratio
+            max_samples=0.5,
             bootstrap=True,
             random_state=42,
         )
 
         self.extra_trees = ExtraTreesClassifier(
             n_estimators=200,
-            max_features="sqrt",
-            max_depth=None,
-            criterion="entropy",
+            max_features=None,
+            max_depth=30,
+            criterion="gini",
             random_state=42,
         )
 
         self.forest_classifier = RandomForestClassifier(
-            n_estimators=50, criterion="entropy", random_state=42
+            n_estimators=100,
+            max_features="sqrt",
+            max_depth=15,
+            criterion="gini",
+            random_state=42,
         )
 
     def train(self):
@@ -143,9 +147,7 @@ class KOI:
         print("Loading models...")
         self.adaboost = joblib.load("saved_models/adaboost.joblib")
         self.stacking = joblib.load("saved_models/stacking.joblib")
-        self.forest_classifier = joblib.load(
-            "saved_models/forest_classifier.joblib"
-        )
+        self.forest_classifier = joblib.load("saved_models/forest_classifier.joblib")
         self.subspace = joblib.load("saved_models/subspace.joblib")
         self.extra_trees = joblib.load("saved_models/extra_trees.joblib")
         self.sc_x = joblib.load("saved_models/scaler.joblib")
@@ -172,7 +174,6 @@ class KOI:
         print(f"(forest_score): {round(forest_score * 100, 3)}%")
         print(f"(subspace_score): {round(subspace_score * 100, 3)}%")
         print(f"(extra_trees_score): {round(extra_trees_score * 100, 3)}%")
-
 
     def get_model_statistics(self):
         """Return comprehensive model statistics for all models"""
@@ -345,46 +346,150 @@ class KOI:
 
         return fig
 
+    def random_search_hyperparameters(self, n_iter=50, cv=10, random_state=42):
+        """
+        Perform randomized search for hyperparameter optimization on all models
+
+        Args:
+            n_iter (int): Number of parameter settings sampled
+            cv (int): Number of cross-validation folds
+            random_state (int): Random state for reproducibility
+        """
+        print("🎲 Starting Randomized Search for hyperparameter optimization...")
+
+        # Define parameter grids for each model
+        param_grids = {
+            "adaboost": {
+                "n_estimators": [50, 100, 200, 500, 1000],
+                "learning_rate": [0.01, 0.1, 0.2, 0.5, 1.0],
+                "estimator": [
+                    DecisionTreeClassifier(max_depth=1),
+                    DecisionTreeClassifier(max_depth=2),
+                    DecisionTreeClassifier(max_depth=3),
+                ],
+            },
+            "forest_classifier": {
+                "n_estimators": [50, 100, 200, 300, 500],
+                "max_depth": [5, 10, 15, 20, None],
+                "criterion": ["gini", "entropy"],
+                "max_features": ["sqrt", "log2", None],
+            },
+            "extra_trees": {
+                "n_estimators": [100, 200, 300, 500],
+                "max_depth": [10, 20, 30, None],
+                "criterion": ["gini", "entropy"],
+                "max_features": ["sqrt", "log2", None],
+            },
+            "subspace": {
+                "n_estimators": [500, 1000, 1500],
+                "max_samples": [0.5, 0.7, 0.8, 1.0],
+                "max_features": [0.3, 0.5, 0.7, 1.0],
+                "estimator": [
+                    DecisionTreeClassifier(),
+                    DecisionTreeClassifier(max_depth=10),
+                    DecisionTreeClassifier(max_depth=20),
+                ],
+            },
+            "stacking": {
+                "final_estimator": [
+                    LogisticRegression(),
+                    LogisticRegression(max_iter=200),
+                    LogisticRegression(max_iter=500),
+                ],
+                "cv": [3, 5, 7],
+            },
+        }
+
+        # Models to optimize
+        models = {
+            "adaboost": self.adaboost,
+            "forest_classifier": self.forest_classifier,
+            "extra_trees": self.extra_trees,
+            "subspace": self.subspace,
+            "stacking": self.stacking,
+        }
+
+        best_models = {}
+        best_scores = {}
+
+        for model_name, model in models.items():
+            print(f"\n🎲 Running Randomized Search for {model_name}...")
+
+            # Create RandomizedSearchCV
+            random_search = RandomizedSearchCV(
+                estimator=model,
+                param_distributions=param_grids[model_name],
+                n_iter=n_iter,
+                cv=cv,
+                scoring="accuracy",
+                random_state=random_state,
+                n_jobs=-1,
+                verbose=1,
+            )
+
+            # Fit the random search
+            random_search.fit(self.x_train, self.y_train)
+
+            # Store best model and score
+            best_models[model_name] = random_search.best_estimator_
+            best_scores[model_name] = random_search.best_score_
+
+            print(f"Best parameters for {model_name}: {random_search.best_params_}")
+            print(
+                f"Best cross-validated score for {model_name}: {random_search.best_score_:.3f}"
+            )
+
+        print(f"\n✅ Randomized Search completed!")
+        print(f"Best overall score: {max(best_scores.values()):.3f}")
+
+        # Return best parameters for manual implementation
+        best_params = {}
+        for model_name, model in best_models.items():
+            best_params[model_name] = model.get_params()
+
+        return best_params, best_scores
+
 
 model = KOI(path="datasets/filtered_file.csv")
 # model.train()
+# model.random_search_hyperparameters()
 # model.save_model()
 model.load_model()
 model.predict()
 
 
 # Metrics
-# (adaboost_score): 81.058%
+# CV mean: 0.8664021164021165 CV std: 0.01051566503404856
+# (adaboost_score): 87.619%
 # (stacking_score): 88.783%
 # (forest_score): 88.571%
-# (subspace_score): 88.042%
-# (extra_trees_score): 87.196%
-# Best parameters for forest: {'max_depth': 20, 'n_estimators': 50}
-# Best cross-validated score: 86.035%
+# (subspace_score): 87.937%
+# (extra_trees_score): 88.042%
+# 🎲 Starting Randomized Search for hyperparameter optimization...
 
 # 🎲 Running Randomized Search for adaboost...
 # Fitting 5 folds for each of 30 candidates, totalling 150 fits
-# Best parameters for adaboost: {'n_estimators': 1000, 'learning_rate': 0.5, 'estimator': DecisionTreeClassifier(max_depth=2)}
-# Best cross-validated score for adaboost: 0.862
-#
+# Best parameters for adaboost: {'n_estimators': 1000, 'learning_rate': 0.2, 'estimator': DecisionTreeClassifier(max_depth=3)}
+# Best cross-validated score for adaboost: 0.868
+
 # 🎲 Running Randomized Search for forest_classifier...
 # Fitting 5 folds for each of 30 candidates, totalling 150 fits
-# Best parameters for forest_classifier: {'n_estimators': 300, 'max_depth': 10, 'criterion': 'entropy'}
+# Best parameters for forest_classifier: {'n_estimators': 100, 'max_features': 'sqrt', 'max_depth': 15, 'criterion': 'gini'}
 # Best cross-validated score for forest_classifier: 0.866
-#
-# 🎲 Running Randomized Search for stacking...
-# Fitting 5 folds for each of 3 candidates, totalling 15 fits
-# /Users/eshaankhare/gitrepo/ExoVision/.venv/lib/python3.11/site-packages/sklearn/model_selection/_search.py:317: UserWarning: The total space of parameters 3 is smaller than n_iter=30. Running 3 iterations. For exhaustive searches, use GridSearchCV.
-#   warnings.warn(
-# Best parameters for stacking: {'final_estimator': LogisticRegression(max_iter=200), 'cv': 5}
-# Best cross-validated score for stacking: 0.862
-#
-# 🎲 Running Randomized Search for subspace...
-# Fitting 5 folds for each of 30 candidates, totalling 150 fits
-# Best parameters for subspace: {'n_estimators': 1000, 'max_samples': 1.0, 'max_features': 0.7, 'estimator': DecisionTreeClassifier()}
-# Best cross-validated score for subspace: 0.866
-#
+
 # 🎲 Running Randomized Search for extra_trees...
 # Fitting 5 folds for each of 30 candidates, totalling 150 fits
 # Best parameters for extra_trees: {'n_estimators': 200, 'max_features': None, 'max_depth': 30, 'criterion': 'gini'}
 # Best cross-validated score for extra_trees: 0.867
+
+# 🎲 Running Randomized Search for subspace...
+# Fitting 5 folds for each of 30 candidates, totalling 150 fits
+# Best parameters for subspace: {'n_estimators': 1500, 'max_samples': 0.5, 'max_features': 0.7, 'estimator': DecisionTreeClassifier()}
+# Best cross-validated score for subspace: 0.867
+
+# 🎲 Running Randomized Search for stacking...
+# /Users/eshaankhare/gitrepo/ExoVision/.venv/lib/python3.12/site-packages/sklearn/model_selection/_search.py:317: UserWarning: The total space of parameters 9 is smaller than n_iter=30. Running 9 iterations. For exhaustive searches, use GridSearchCV.
+#   warnings.warn(
+# Fitting 5 folds for each of 9 candidates, totalling 45 fits
+# Best parameters for stacking: {'final_estimator': LogisticRegression(), 'cv': 5}
+# Best cross-validated score for stacking: 0.862

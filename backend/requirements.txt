@@ -1,0 +1,27 @@
+# ExoVision Backend Requirements for Hugging Face Spaces
+# Core dependencies for the AI exoplanet detection system
+
+# Gradio for web interface
+gradio>=5.22.0
+
+# OpenAI for AI chat functionality
+openai>=1.68.2
+openai-agents>=0.0.15
+
+# Data processing and ML
+pandas>=1.5.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Visualization
+plotly>=6.0.1
+
+# Environment and utilities
+python-dotenv>=1.0.1
+
+# Additional dependencies that might be needed
+requests>=2.28.0
+httpx>=0.24.0
+ipython>=8.0.0
+pypdf>=5.4.0

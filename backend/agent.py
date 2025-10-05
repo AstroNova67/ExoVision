@@ -16,14 +16,10 @@ import pandas as pd
 from typing import Dict, List, Tuple
 from IPython.display import display, Markdown
 from KOI import KOI
-from TESS import TESS
 import numpy as np
 from pypdf import PdfReader
 
 load_dotenv(override=True)
-
-ollama_client = AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
-ollama_model = OpenAIChatCompletionsModel(model="llama3.2", openai_client=ollama_client)
 
 openai_client = AsyncOpenAI(
     base_url="https://api.openai.com/v1", api_key=os.getenv("OPENAI_API_KEY")
@@ -402,7 +398,6 @@ prediction_agent = Agent(
     instructions=prediction_instructions,
     model=openai_model,
     tools=[predict_koi_exoplanet],
-    model_settings=ModelSettings(tools_choice="required"),
 )
 
 # Set up handoff from general agent to prediction agent
@@ -873,7 +868,7 @@ class ExoVisionGradioInterface:
                     show_label=False,
                     container=True,
                     show_copy_button=True,
-                    type="messages"
+                    type="messages",
                 )
 
                 # Input area
@@ -885,18 +880,9 @@ class ExoVisionGradioInterface:
                         max_lines=3,
                         scale=4,
                     )
-                    send_btn = gr.Button(
-                        "Send", 
-                        variant="primary", 
-                        size="sm",
-                        scale=1
-                    )
+                    send_btn = gr.Button("Send", variant="primary", size="sm", scale=1)
 
-                clear_btn = gr.Button(
-                    "Clear Chat", 
-                    variant="secondary", 
-                    size="sm"
-                )
+                clear_btn = gr.Button("Clear Chat", variant="secondary", size="sm")
 
             # Main content area with tabs (excluding chat tab)
             with gr.Tabs():
@@ -1129,13 +1115,11 @@ class ExoVisionGradioInterface:
             def update_confusion_matrix(model_name):
                 """Update confusion matrix when model selection changes"""
                 return self.create_confusion_matrix_plot(model_name)
-            
 
             # Connect events with Enter key support
             msg.submit(respond, [msg, chatbot], [chatbot, msg])
             send_btn.click(respond, [msg, chatbot], [chatbot, msg])
             clear_btn.click(clear_chat, outputs=[chatbot, msg])
-            
 
             # Parameter input event handlers
             generate_query_btn.click(
@@ -1180,7 +1164,6 @@ class ExoVisionGradioInterface:
                 inputs=[model_selector],
                 outputs=[confusion_matrix_plot],
             )
-            
 
             # Batch processing event handlers
             upload_btn.click(
@@ -1206,10 +1189,10 @@ async def main():
     demo = create_gradio_interface()
     demo.launch(
         server_name="0.0.0.0",
-        server_port=7862,
+        server_port=7860,  # Hugging Face Spaces expects port 7860
         share=False,
         show_error=True,
-        inbrowser=True,
+        inbrowser=False,  # Don't try to open browser in container
     )
 
 
