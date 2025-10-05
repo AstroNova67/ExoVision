@@ -27,7 +27,7 @@ Open your terminal and follow these steps:
 
 2. Clone this repository and navigate to the project directory:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/AstroNova67/ExoVision.git
    cd ExoVision
    ```
 
@@ -38,8 +38,8 @@ Open your terminal and follow these steps:
 
 4. Set up your OpenAI API key:
    ```bash
-   # Create a .env file in the backend directory
-   echo "OPENAI_API_KEY=sk-proj-your-key-here" > backend/.env
+   # Create a .env file 
+   echo "OPENAI_API_KEY=sk-proj-your-key-here" > .env
    ```
    
    **Note:** Replace `sk-proj-your-key-here` with your actual OpenAI API key. You can get one from [OpenAI's website](https://platform.openai.com/api-keys).
