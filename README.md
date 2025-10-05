@@ -1,14 +1,13 @@
----
-title: ExoVision
-app_file: app.py
-sdk: gradio
-sdk_version: 5.34.2
----
 # ExoVision
 AstroNova subsection for NASA Space Apps Challenge
+
+## 🚀 Live Demo
+**Try ExoVision now:** [https://huggingface.co/spaces/E5haan/ExoVision](https://huggingface.co/spaces/E5haan/ExoVision)
+
+---
 ExoVision uses an OpenAI Agents framework with ensemble machine learning models to automatically analyze exoplanet data from NASA's Kepler Objects of Interest (KOI) dataset. The system combines multiple ensemble ML algorithms for robust exoplanet detection and provides a Gradio web interface for interactive analysis and visualization.
 
-## Setup
+## Local Setup
 
 This project uses [uv](https://docs.astral.sh/uv/) for Python package management. To get started:
 
