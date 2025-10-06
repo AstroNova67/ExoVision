@@ -5,3 +5,5 @@ env/
 venv/
 .DS_store
 backend/__pycache__
+backend/README.md
+
