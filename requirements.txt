@@ -31,6 +31,10 @@ click==8.3.0
     #   uvicorn
 colorama==0.4.6
     # via griffe
+contourpy==1.3.3
+    # via matplotlib
+cycler==0.12.1
+    # via matplotlib
 distro==1.9.0
     # via openai
 fastapi==0.117.1
@@ -39,6 +43,8 @@ ffmpy==0.6.1
     # via gradio
 filelock==3.19.1
     # via huggingface-hub
+fonttools==4.60.1
+    # via matplotlib
 fsspec==2025.9.0
     # via
     #   gradio-client
@@ -90,12 +96,18 @@ jsonschema==4.25.1
     # via mcp
 jsonschema-specifications==2025.9.1
     # via jsonschema
+kiwisolver==1.4.9
+    # via matplotlib
 markdown-it-py==4.0.0
     # via rich
 markupsafe==3.0.3
     # via
     #   gradio
     #   jinja2
+matplotlib==3.10.6
+    # via
+    #   exovision (pyproject.toml)
+    #   seaborn
 mcp==1.15.0
     # via openai-agents
 mdurl==0.1.2
@@ -105,10 +117,13 @@ narwhals==2.5.0
 numpy==2.3.3
     # via
     #   exovision (pyproject.toml)
+    #   contourpy
     #   gradio
+    #   matplotlib
     #   pandas
     #   scikit-learn
     #   scipy
+    #   seaborn
 openai==1.109.1
     # via
     #   exovision (pyproject.toml)
@@ -122,13 +137,17 @@ packaging==25.0
     #   gradio
     #   gradio-client
     #   huggingface-hub
+    #   matplotlib
     #   plotly
 pandas==2.3.2
     # via
     #   exovision (pyproject.toml)
     #   gradio
+    #   seaborn
 pillow==11.3.0
-    # via gradio
+    # via
+    #   gradio
+    #   matplotlib
 plotly==6.3.0
     # via exovision (pyproject.toml)
 psutil==7.1.0
@@ -149,10 +168,14 @@ pydub==0.25.1
     # via gradio
 pygments==2.19.2
     # via rich
+pyparsing==3.2.5
+    # via matplotlib
 pypdf==6.1.0
     # via exovision (pyproject.toml)
 python-dateutil==2.9.0.post0
-    # via pandas
+    # via
+    #   matplotlib
+    #   pandas
 python-dotenv==1.1.1
     # via
     #   exovision (pyproject.toml)
@@ -190,6 +213,8 @@ scikit-learn==1.7.2
     # via exovision (pyproject.toml)
 scipy==1.16.2
     # via scikit-learn
+seaborn==0.13.2
+    # via exovision (pyproject.toml)
 semantic-version==2.10.0
     # via gradio
 setuptools==80.9.0
