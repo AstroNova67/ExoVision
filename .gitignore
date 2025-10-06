@@ -4,4 +4,4 @@
 env/
 venv/
 .DS_store
-__pypackages__/
+backend/__pypackages__/

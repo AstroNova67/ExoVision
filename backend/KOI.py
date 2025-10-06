@@ -281,6 +281,8 @@ class KOI:
         fig.update_layout(
             xaxis=dict(tickmode="array", tickvals=[0, 1], ticktext=class_labels),
             yaxis=dict(tickmode="array", tickvals=[0, 1], ticktext=class_labels),
+            autosize=True,
+            margin=dict(l=50, r=50, t=50, b=50),
         )
 
         return fig
@@ -309,7 +311,8 @@ class KOI:
             xaxis_title="Models",
             yaxis_title="Score (%)",
             barmode="group",
-            height=500,
+            autosize=True,
+            margin=dict(l=50, r=50, t=50, b=50),
         )
 
         return fig
@@ -340,8 +343,9 @@ class KOI:
             xaxis_title="Features",
             yaxis_title="Importance Score",
             barmode="group",
-            height=500,
             xaxis_tickangle=-45,
+            autosize=True,
+            margin=dict(l=50, r=50, t=50, b=50),
         )
 
         return fig
