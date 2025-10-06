@@ -25,9 +25,9 @@ from sklearn.model_selection import (
 from sklearn.preprocessing import RobustScaler, LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 import joblib
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 
 class KOI:
@@ -266,56 +266,43 @@ class KOI:
         cm = confusion_matrix(self.y_test, y_pred)
         print(cm)
 
-        # Create plotly confusion matrix
-        fig = px.imshow(
-            cm,
-            text_auto=True,
-            aspect="auto",
-            title=f"{model_name} Confusion Matrix",
-            labels=dict(x="Predicted", y="Actual"),
-            color_continuous_scale="Blues",
-        )
-
-        # Add class labels
-        class_labels = ["CANDIDATE", "CONFIRMED"]
-        fig.update_layout(
-            xaxis=dict(tickmode="array", tickvals=[0, 1], ticktext=class_labels),
-            yaxis=dict(tickmode="array", tickvals=[0, 1], ticktext=class_labels),
-            autosize=True,
-            margin=dict(l=50, r=50, t=50, b=50),
-        )
-
-        return fig
+        # Create matplotlib confusion matrix
+        plt.figure(figsize=(6, 5))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                   xticklabels=['CANDIDATE', 'CONFIRMED'],
+                   yticklabels=['CANDIDATE', 'CONFIRMED'])
+        plt.title(f'{model_name} Confusion Matrix')
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        plt.tight_layout()
+        
+        return plt.gcf()
 
     def create_model_comparison_plot(self):
         """Create comparison plot of all model performances"""
         stats_df = self.get_model_statistics()
 
-        fig = go.Figure()
-
+        # Create matplotlib bar plot
+        plt.figure(figsize=(10, 6))
+        
         metrics = ["Accuracy", "Precision", "Recall", "F1-Score"]
         colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
-
+        
+        x = np.arange(len(stats_df.index))
+        width = 0.2
+        
         for i, metric in enumerate(metrics):
-            fig.add_trace(
-                go.Bar(
-                    name=metric,
-                    x=stats_df.index,
-                    y=stats_df[metric],
-                    marker_color=colors[i],
-                )
-            )
-
-        fig.update_layout(
-            title="Model Performance Comparison",
-            xaxis_title="Models",
-            yaxis_title="Score (%)",
-            barmode="group",
-            autosize=True,
-            margin=dict(l=50, r=50, t=50, b=50),
-        )
-
-        return fig
+            plt.bar(x + i * width, stats_df[metric], width, 
+                   label=metric, color=colors[i])
+        
+        plt.title("Model Performance Comparison")
+        plt.xlabel("Models")
+        plt.ylabel("Score (%)")
+        plt.xticks(x + width * 1.5, stats_df.index)
+        plt.legend()
+        plt.tight_layout()
+        
+        return plt.gcf()
 
     def create_feature_importance_plot(self):
         """Create feature importance visualization"""
@@ -324,31 +311,26 @@ class KOI:
         if importance_df.empty:
             return None
 
-        fig = go.Figure()
-
+        # Create matplotlib bar plot
+        plt.figure(figsize=(12, 6))
+        
         colors = ["#1f77b4", "#ff7f0e", "#2ca02c"]
-
+        
+        x = np.arange(len(importance_df.index))
+        width = 0.25
+        
         for i, model in enumerate(importance_df.columns):
-            fig.add_trace(
-                go.Bar(
-                    name=model,
-                    x=importance_df.index,
-                    y=importance_df[model],
-                    marker_color=colors[i % len(colors)],
-                )
-            )
-
-        fig.update_layout(
-            title="Feature Importance Across Models",
-            xaxis_title="Features",
-            yaxis_title="Importance Score",
-            barmode="group",
-            xaxis_tickangle=-45,
-            autosize=True,
-            margin=dict(l=50, r=50, t=50, b=50),
-        )
-
-        return fig
+            plt.bar(x + i * width, importance_df[model], width, 
+                   label=model, color=colors[i % len(colors)])
+        
+        plt.title("Feature Importance Across Models")
+        plt.xlabel("Features")
+        plt.ylabel("Importance Score")
+        plt.xticks(x + width, importance_df.index, rotation=45, ha='right')
+        plt.legend()
+        plt.tight_layout()
+        
+        return plt.gcf()
 
     def random_search_hyperparameters(self, n_iter=50, cv=10, random_state=42):
         """

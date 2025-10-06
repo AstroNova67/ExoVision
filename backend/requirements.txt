@@ -16,6 +16,8 @@ joblib>=1.3.0
 
 # Visualization
 plotly>=6.0.1
+matplotlib>=3.7.0
+seaborn>=0.12.0
 
 # Environment and utilities
 python-dotenv>=1.0.1

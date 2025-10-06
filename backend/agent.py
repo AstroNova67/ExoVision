@@ -1192,7 +1192,7 @@ async def main():
         server_port=7860,  # Hugging Face Spaces expects port 7860
         share=False,
         show_error=True,
-        inbrowser=False,  # Don't try to open browser in container
+        inbrowser=True,  # Don't try to open browser in container
     )
 
 
